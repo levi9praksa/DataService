@@ -1,6 +1,7 @@
 package com.example.controllers;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -84,7 +85,7 @@ public class CurrencyController {
 				j++;
 			}
 
-			System.out.print("Storing data into database completed.");
+			System.out.println("Storing data into database completed.");
 			return "Storing data into database completed.";
 
 		} catch (IOException e) {
@@ -92,5 +93,21 @@ public class CurrencyController {
 			return "Error";
 		}
 
+	}
+	
+	//Just testing for future
+	@RequestMapping("/showCurrencies")
+	public String showCrypto() {
+		
+		StringBuilder sb = new StringBuilder();
+		List<Currency> list = cr.findAll();
+		for(Currency c : list) {
+			
+			sb.append(c.getId() + "\t" + c.getName() + "\t" + c.getSymbol() + "\t"  + c.getPriceusd() + "\t" + c.getChangepercent24h() + "\t" + c.getThreshold());
+			System.out.println(c.getId() + "\t" + c.getName() + "\t" + c.getSymbol() + "\t"  + c.getPriceusd() + "\t" + c.getChangepercent24h() + "\t" + c.getThreshold());
+		}
+		
+
+		return sb.toString();
 	}
 }
