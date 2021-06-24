@@ -22,6 +22,13 @@ import okhttp3.Response;
 @EnableScheduling
 public class CurrencyController {
 
+	private static final int CURRENCY_NAME_LINE = 4;
+	private static final int CURRENCY_SYMBOL_LINE = 8;
+	private static final int CURRENCY_USDPRICE_LINE = 20;
+	private static final int CURRENCY_PERCENTCHANGE_LINE = 22;
+	private static final int END_OF_CURRENCY = 30;
+	private static final int LAST_LINE = 300;
+	
 	@Autowired
 	CurrencyRepository cr;
 
@@ -46,7 +53,7 @@ public class CurrencyController {
 
 			for (String t : tokens) {
 				String[] s = t.split("[\"]");
-				if (i == 30) {
+				if (i == END_OF_CURRENCY) {
 					i = 3;
 					id++;
 					c.setId(id);
@@ -58,19 +65,19 @@ public class CurrencyController {
 
 				switch (i) {
 
-				case 4:
+				case CURRENCY_NAME_LINE:
 					c.setName(s[1]);
 					break;
 
-				case 8:
+				case CURRENCY_SYMBOL_LINE:
 					c.setSymbol(s[1]);
 					break;
 
-				case 20:
+				case CURRENCY_USDPRICE_LINE:
 					c.setPriceusd(Float.parseFloat(s[1]));
 					break;
 
-				case 22:
+				case CURRENCY_PERCENTCHANGE_LINE:
 					c.setChangepercent24h(Float.parseFloat(s[1]));
 					break;
 
@@ -79,7 +86,7 @@ public class CurrencyController {
 
 				}
 
-				if (j == 300)
+				if (j == LAST_LINE)
 					break;
 				i++;
 				j++;
