@@ -5,6 +5,8 @@ import java.io.IOException;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,6 +18,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 @RestController
+@EnableScheduling
 public class CurrencyController {
 
 	@Autowired
@@ -23,7 +26,8 @@ public class CurrencyController {
 
 	@RequestMapping("/putCurrencies")
 	@PostConstruct
-	public void putCurrencies() {
+	@Scheduled(cron = "0 * * ? * *")
+	public String putCurrencies() {
 
 		OkHttpClient client = new OkHttpClient().newBuilder().build();
 		Request request = new Request.Builder().url("https://api.coincap.io/v2/assets/").method("GET", null).build();
@@ -81,11 +85,11 @@ public class CurrencyController {
 			}
 
 			System.out.print("Storing data into database completed.");
+			return "Storing data into database completed.";
 
-		} catch (
-
-		IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
+			return "Error";
 		}
 
 	}
