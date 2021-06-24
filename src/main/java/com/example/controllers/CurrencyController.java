@@ -22,6 +22,7 @@ import okhttp3.Response;
 @EnableScheduling
 public class CurrencyController {
 
+	private static final int START_OF_CURRENCY = 3;
 	private static final int CURRENCY_NAME_LINE = 4;
 	private static final int CURRENCY_SYMBOL_LINE = 8;
 	private static final int CURRENCY_USDPRICE_LINE = 20;
@@ -54,7 +55,7 @@ public class CurrencyController {
 			for (String t : tokens) {
 				String[] s = t.split("[\"]");
 				if (i == END_OF_CURRENCY) {
-					i = 3;
+					i = START_OF_CURRENCY;
 					id++;
 					c.setId(id);
 					c.setThreshold(0);
