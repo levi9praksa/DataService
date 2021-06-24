@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.repository.CurrencyRepository;
+import com.example.repository.CurrencyRepository;
 
 @Configuration
 public class CurrencyConfig {

@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.repository.CurrencyRepository;
+import com.example.repository.CurrencyRepository;
 
 import model.Currency;
 import okhttp3.OkHttpClient;
@@ -104,18 +104,15 @@ public class CurrencyController {
 	}
 	
 	//Just testing for future
-	@RequestMapping("/showCurrencies")
-	public String showCrypto() {
+	@RequestMapping("/getCurrencies")
+	public List<Currency> getCurrencies() {
 		
-		StringBuilder sb = new StringBuilder();
 		List<Currency> list = cr.findAll();
 		for(Currency c : list) {
-			
-			sb.append(c.getId() + "\t" + c.getName() + "\t" + c.getSymbol() + "\t"  + c.getPriceusd() + "\t" + c.getChangepercent24h() + "\t" + c.getThreshold());
 			System.out.println(c.getId() + "\t" + c.getName() + "\t" + c.getSymbol() + "\t"  + c.getPriceusd() + "\t" + c.getChangepercent24h() + "\t" + c.getThreshold());
 		}
 		
-
-		return sb.toString();
+		return list;
+		
 	}
 }
