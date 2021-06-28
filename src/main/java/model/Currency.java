@@ -1,7 +1,14 @@
 package model;
 
 import java.io.Serializable;
-import javax.persistence.*;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+
+import lombok.Data;
 
 
 /**
@@ -10,6 +17,7 @@ import javax.persistence.*;
  */
 @Entity
 @NamedQuery(name="Currency.findAll", query="SELECT c FROM Currency c")
+@Data
 public class Currency implements Serializable {
 	@Override
 	public String toString() {
@@ -24,7 +32,7 @@ public class Currency implements Serializable {
 	private Integer id;
 
 	private float changepercent24h;
-
+	
 	private String name;
 
 	private float priceusd;
@@ -32,56 +40,7 @@ public class Currency implements Serializable {
 	private String symbol;
 
 	private float threshold;
+	
 
-	public Currency() {
-	}
-
-	public Integer getId() {
-		return this.id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public float getChangepercent24h() {
-		return this.changepercent24h;
-	}
-
-	public void setChangepercent24h(float changepercent24h) {
-		this.changepercent24h = changepercent24h;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public float getPriceusd() {
-		return this.priceusd;
-	}
-
-	public void setPriceusd(float priceusd) {
-		this.priceusd = priceusd;
-	}
-
-	public String getSymbol() {
-		return this.symbol;
-	}
-
-	public void setSymbol(String symbol) {
-		this.symbol = symbol;
-	}
-
-	public float getThreshold() {
-		return this.threshold;
-	}
-
-	public void setThreshold(float threshold) {
-		this.threshold = threshold;
-	}
 
 }
