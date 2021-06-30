@@ -2,7 +2,6 @@ package com.example.controllers;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,23 +10,21 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.DataService.CurrencyService;
 import com.example.DataService.Filters;
 
+import lombok.AllArgsConstructor;
 import model.Currency;
 
+@AllArgsConstructor
 @RestController
 public class CurrencyController {
 
-	@Autowired
 	private Filters filters;
-	
-	@Autowired
 	private CurrencyService currencyService;
 	
 	@RequestMapping("/putCurrencies")
 	public void putCurrencies(){
 		currencyService.putCurrencies();
 	}
-	
-	
+		
 	@RequestMapping(value = "/filterByRange", method = RequestMethod.GET)
 	public List<Currency> filterByRange(@RequestParam(value = "min") float minRange, @RequestParam(value = "max") float maxRange) {
 		return  filters.filterByRange(minRange, maxRange);

@@ -25,7 +25,4 @@ public class CurrencyDTO implements Serializable{
 	private String changePercent24Hr;
 	private String vwap24Hr;
 	private String explorer;
-		
-	
-
 }

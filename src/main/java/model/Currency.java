@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,8 +22,8 @@ import lombok.Data;
 public class Currency implements Serializable {
 	@Override
 	public String toString() {
-		return "Currency [id=" + id + ", changepercent24h=" + changepercent24h + ", name=" + name + ", priceusd="
-				+ priceusd + ", symbol=" + symbol + ", threshold=" + threshold + "]";
+		return "Currency [id=" + id  + ", name=" + name + ", symbol=" + symbol + ", priceusd=" + priceusd 
+				+ ", changepercent24h=" + changepercent24h  + ", threshold=" + threshold + "]";
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -30,17 +31,15 @@ public class Currency implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;
-
-	private float changepercent24h;
 	
 	private String name;
-
-	private float priceusd;
-
-	private String symbol;
-
-	private float threshold;
 	
-
+	private String symbol;
+	
+	private BigDecimal priceusd;
+	
+	private BigDecimal changepercent24h;
+	
+	private BigDecimal threshold;
 
 }
