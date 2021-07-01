@@ -20,7 +20,8 @@ import lombok.Data;
 @NamedQuery(name="History.findAll", query="SELECT h FROM History h")
 @Data
 public class History implements Serializable {
-	private static final long serialVersionUID = 1L;
+	
+	private static final long serialVersionUID = -3979646284510193116L;
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)

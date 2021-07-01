@@ -17,12 +17,12 @@ public class Filters {
 	private static final String CHANGEPERCENT24H_FILTER = "changepercent";
 	private static final String PRICE_FILTER = "price";
 	final CurrencyRepository cr;
-
-	public List<Currency> filterByRange(float minRange, float maxRange) {	
+		
+	public List<Currency> filterByRange(float minRange, float maxRange) {			
 		return cr.findAll().stream()
-				.filter(c -> c.getPriceusd().floatValue() > minRange)
-				.filter(c -> c.getPriceusd().floatValue() < maxRange)
+				.filter(c -> c.getPriceusd().floatValue() > minRange && c.getPriceusd().floatValue() < maxRange)
 				.collect(Collectors.toList());
+			
 	}
 	
 	
@@ -47,6 +47,11 @@ public class Filters {
 	
 	
 	public Currency searchByName(String name) {
+		
+		if(cr.findAll().isEmpty()) {
+			return null;
+		}
+		
 		return cr.findAll().stream()
 				.filter(c -> c.getName().trim().equals(name))
 				.findFirst()
@@ -55,6 +60,11 @@ public class Filters {
 	}
 	
 	public Currency searchBySymbol(String symbol) {
+		
+		if(cr.findAll().isEmpty()) {
+			return null;
+		}
+		
 		return cr.findAll().stream()
 				.filter(c -> c.getSymbol().trim().equals(symbol))
 				.findFirst()
