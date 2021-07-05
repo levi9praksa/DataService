@@ -13,17 +13,17 @@ public class HistoryService {
 	final HistoryRepository hr;
 
 	public List<History> historySearch(String name, int interval, int lastInterval){
-		if(!name.equals("") && interval >= 0) {	
+		if(!name.isBlank() && interval >= 0) {	
 			return hr.findAll().stream()
 					.filter(lh -> lh.getCurrencyname().trim().equals(name) && lh.getInterval() >= lastInterval - interval)
 					.collect(Collectors.toList());			
 		}
-		if(name.equals("") && interval >= 0) {		
+		if(name.isBlank() && interval >= 0) {		
 			return hr.findAll().stream()
 					.filter(lh -> lh.getInterval() >= lastInterval - interval)
 					.collect(Collectors.toList());			
 		}
-		if(!name.equals("") && interval < 0) {
+		if(!name.isBlank() && interval < 0) {
 			return hr.findAll().stream()
 					.filter(lh -> lh.getCurrencyname().trim().equals(name))
 					.collect(Collectors.toList());			
