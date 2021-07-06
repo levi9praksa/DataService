@@ -22,7 +22,7 @@ import lombok.Data;
 public class History implements Serializable {
 	
 	private static final long serialVersionUID = -3979646284510193116L;
-
+ 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer id;

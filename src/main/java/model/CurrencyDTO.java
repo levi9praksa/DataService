@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class CurrencyDTO implements Serializable{
-	
+	 
 	private static final long serialVersionUID = -7196689619928326856L;
 	private String id;
 	private String rank;
