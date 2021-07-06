@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -97,8 +98,11 @@ public class AuthService {
 						.roles(roles).id(userRepository.getMaxId() + 1).build();
 				userRepository.save(user);
 				return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+			} else if (roles.isEmpty()) {
+				logger.error("Roles can not be empty!");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Roles can not be empty!");
 			}
 		}
-		return ResponseEntity.ok(new MessageResponse("Registration failed!"));
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Registration failed!");
 	}
 }

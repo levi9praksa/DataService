@@ -20,7 +20,9 @@ import com.example.AuthService.services.AuthService;
 import com.example.repository.RoleRepository;
 import com.example.repository.UserRepository;
 
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/auth")
