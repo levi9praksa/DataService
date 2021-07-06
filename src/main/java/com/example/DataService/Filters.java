@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 import model.Currency;
 
 @AllArgsConstructor
-@Service
+@Service 
 public class Filters {
 	
 	private static final String CHANGEPERCENT24H_FILTER = "changepercent";
