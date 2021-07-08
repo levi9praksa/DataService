@@ -2,6 +2,7 @@ package com.example.DataService;
 
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -26,12 +27,18 @@ import model.Asset;
 import model.Currency;
 import model.CurrencyDTO;
 import model.History;
+import model.RealCurrencyAsset;
+import model.RealCurrencyDTO;
 
 @RequiredArgsConstructor
 @EnableScheduling 
 @Service
 public class CurrencyService {
 	 
+	private static final String URL_RATES = "/rates";
+
+	private static final String URL_ASSETS = "/assets";
+
 	static final List<String> currencySymbolList = List.of("BTC", "ETH", "USDT", "BNB", "ADA", "DOGE", "XRP", "USDC", "DOT", "UNI" );
 	
 	private Logger logger = LoggerFactory.getLogger(CurrencyService.class);
@@ -44,19 +51,18 @@ public class CurrencyService {
 	
 	private static final int INTERVAL_INCREASEMENT = 1;
 	private static final int STATUS_CODE_CONSTRAINT = 400;
-	private static final int DEFAULT_THRESHOLD = 0;
 	private static final int FIRST_CURRENCY = 1;
-		 
+	
 	public Asset putCurrencies() {
  
 		RestTemplate restTemplate = new RestTemplate();
 
-		ResponseEntity<String> response = restTemplate.getForEntity(uri, String.class);
+		ResponseEntity<String> response = restTemplate.getForEntity(uri + URL_ASSETS, String.class);
 		 
 		if (response.getStatusCodeValue() < STATUS_CODE_CONSTRAINT) {
 			
 			try {
-				Asset result = restTemplate.getForObject(uri, Asset.class);
+				Asset result = restTemplate.getForObject(uri + URL_ASSETS, Asset.class);
 	
 				for (int i = FIRST_CURRENCY; i <= result.getData().length - 1; i++) {
 				 	Currency currency = new Currency();
@@ -66,7 +72,6 @@ public class CurrencyService {
 					currency.setSymbol(result.getData()[currencyId].getSymbol());
 					currency.setPriceusd(new BigDecimal((result.getData()[currencyId].getPriceUsd())));
 					currency.setChangepercent24h(new BigDecimal((result.getData()[currencyId].getChangePercent24Hr())));
-					currency.setThreshold(new BigDecimal(DEFAULT_THRESHOLD));
 					cr.save(currency);
 				}
 	
@@ -122,6 +127,7 @@ public class CurrencyService {
 		
 	}
 	
+	
 	public ResponseEntity<?> updateThreshold(Currency currency) {
 		if(!cr.existsById(currency.getId())) {
 			logger.error("Unknown currency with id: " + currency.getId());
@@ -134,5 +140,67 @@ public class CurrencyService {
 	public Collection<Currency> getAllCurrencies() {
 		return cr.findAll();
 	}
+	
+	
+	public BigDecimal currencyExchange(Currency from, Currency to) {
+		if(from == null) {
+			logger.error("Error finding the currency you want to convert from." );
+			return new BigDecimal(-1);
+		}
+		
+		if(to == null) {
+			logger.error("Error finding the currency you want to convert to." );
+			return new BigDecimal(-1);
+		}
+		
+		return from.getPriceusd().divide(to.getPriceusd(), 16, RoundingMode.CEILING);		
+	}
+	
+	
+	public BigDecimal currencyExchangeIntoRealCurrency(Currency from, String to) {
+		
+		RealCurrencyDTO toCurrency = new RealCurrencyDTO();
+
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> response = restTemplate.getForEntity(uri + URL_RATES, String.class);
+
+		if (response.getStatusCodeValue() < STATUS_CODE_CONSTRAINT) {
+
+			try {
+
+				RealCurrencyAsset result = restTemplate.getForObject(uri + URL_RATES, RealCurrencyAsset.class);
+				for (int i = 0; i <= result.getData().length-1; i++) {
+					if (result.getData()[i].getId().equals(to)) {
+						toCurrency.setId(result.getData()[i].getId());
+						toCurrency.setCurrencySymbol(result.getData()[i].getCurrencySymbol());
+						toCurrency.setRateUsd(result.getData()[i].getRateUsd());
+						toCurrency.setSymbol(result.getData()[i].getSymbol());
+						toCurrency.setType(result.getData()[i].getType());
+						logger.info(toCurrency.toString());
+					}
+				}
+
+			} catch (Exception e) {
+				logger.error(e.toString());
+				return new BigDecimal(-1);
+			}
+		}
+
+		if (from == null) {
+			logger.error("Error finding the currency you want to convert from." );
+			return new BigDecimal(-1);
+		}
+		
+		if(toCurrency.getId() == null) {
+			logger.error("Error finding the currency you want to convert to." );
+			return new BigDecimal(-1);
+		}
+		
+		BigDecimal result = from.getPriceusd().divide(new BigDecimal(toCurrency.getRateUsd()), 16, RoundingMode.CEILING);
+		
+		logger.info("Exchange rate from " + from.getName() + " to " + toCurrency.getId() + " is: " + result);
+		return result;
+	}
+	
 			
 } 
