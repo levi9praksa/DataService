@@ -35,15 +35,16 @@ import model.RealCurrencyDTO;
 @Service
 public class CurrencyService {
 	 
+	private static final String URL_RATES = "/rates";
+
+	private static final String URL_ASSETS = "/assets";
+
 	static final List<String> currencySymbolList = List.of("BTC", "ETH", "USDT", "BNB", "ADA", "DOGE", "XRP", "USDC", "DOT", "UNI" );
 	
 	private Logger logger = LoggerFactory.getLogger(CurrencyService.class);
 	
 	@Value("${coin-api-url}")
 	private String uri;
-	
-	@Value("${coin-api-currency-exchange-url}")
-	private String exchangeUri;
 	
 	final CurrencyRepository cr;
 	final HistoryRepository hr;
@@ -56,12 +57,12 @@ public class CurrencyService {
  
 		RestTemplate restTemplate = new RestTemplate();
 
-		ResponseEntity<String> response = restTemplate.getForEntity(uri, String.class);
+		ResponseEntity<String> response = restTemplate.getForEntity(uri + URL_ASSETS, String.class);
 		 
 		if (response.getStatusCodeValue() < STATUS_CODE_CONSTRAINT) {
 			
 			try {
-				Asset result = restTemplate.getForObject(uri, Asset.class);
+				Asset result = restTemplate.getForObject(uri + URL_ASSETS, Asset.class);
 	
 				for (int i = FIRST_CURRENCY; i <= result.getData().length - 1; i++) {
 				 	Currency currency = new Currency();
@@ -142,8 +143,13 @@ public class CurrencyService {
 	
 	
 	public BigDecimal currencyExchange(Currency from, Currency to) {
-		if(from == null || to == null) {
-			logger.error("There is no such currency");
+		if(from == null) {
+			logger.error("Error finding the currency you want to convert from." );
+			return new BigDecimal(-1);
+		}
+		
+		if(to == null) {
+			logger.error("Error finding the currency you want to convert to." );
 			return new BigDecimal(-1);
 		}
 		
@@ -156,13 +162,13 @@ public class CurrencyService {
 		RealCurrencyDTO toCurrency = new RealCurrencyDTO();
 
 		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<String> response = restTemplate.getForEntity(exchangeUri, String.class);
+		ResponseEntity<String> response = restTemplate.getForEntity(uri + URL_RATES, String.class);
 
 		if (response.getStatusCodeValue() < STATUS_CODE_CONSTRAINT) {
 
 			try {
 
-				RealCurrencyAsset result = restTemplate.getForObject(exchangeUri, RealCurrencyAsset.class);
+				RealCurrencyAsset result = restTemplate.getForObject(uri + URL_RATES, RealCurrencyAsset.class);
 				for (int i = 0; i <= result.getData().length-1; i++) {
 					if (result.getData()[i].getId().equals(to)) {
 						toCurrency.setId(result.getData()[i].getId());
@@ -171,11 +177,8 @@ public class CurrencyService {
 						toCurrency.setSymbol(result.getData()[i].getSymbol());
 						toCurrency.setType(result.getData()[i].getType());
 						logger.info(toCurrency.toString());
-
 					}
 				}
-				
-				toCurrency = null;
 
 			} catch (Exception e) {
 				logger.error(e.toString());
@@ -183,12 +186,20 @@ public class CurrencyService {
 			}
 		}
 
-		if (from == null || toCurrency == null) {
-			logger.error("There is no such currency");
+		if (from == null) {
+			logger.error("Error finding the currency you want to convert from." );
 			return new BigDecimal(-1);
 		}
-
-		return from.getPriceusd().divide(new BigDecimal(toCurrency.getRateUsd()), 16, RoundingMode.CEILING);
+		
+		if(toCurrency.getId() == null) {
+			logger.error("Error finding the currency you want to convert to." );
+			return new BigDecimal(-1);
+		}
+		
+		BigDecimal result = from.getPriceusd().divide(new BigDecimal(toCurrency.getRateUsd()), 16, RoundingMode.CEILING);
+		
+		logger.info("Exchange rate from " + from.getName() + " to " + toCurrency.getId() + " is: " + result);
+		return result;
 	}
 	
 			
