@@ -2,6 +2,7 @@ package com.example.DataService;
 
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +27,8 @@ import model.Asset;
 import model.Currency;
 import model.CurrencyDTO;
 import model.History;
+import model.RealCurrencyAsset;
+import model.RealCurrencyDTO;
 
 @RequiredArgsConstructor
 @EnableScheduling 
@@ -39,14 +42,16 @@ public class CurrencyService {
 	@Value("${coin-api-url}")
 	private String uri;
 	
+	@Value("${coin-api-currency-exchange-url}")
+	private String exchangeUri;
+	
 	final CurrencyRepository cr;
 	final HistoryRepository hr;
 	
 	private static final int INTERVAL_INCREASEMENT = 1;
 	private static final int STATUS_CODE_CONSTRAINT = 400;
-	private static final int DEFAULT_THRESHOLD = 0;
 	private static final int FIRST_CURRENCY = 1;
-		 
+	
 	public Asset putCurrencies() {
  
 		RestTemplate restTemplate = new RestTemplate();
@@ -66,7 +71,6 @@ public class CurrencyService {
 					currency.setSymbol(result.getData()[currencyId].getSymbol());
 					currency.setPriceusd(new BigDecimal((result.getData()[currencyId].getPriceUsd())));
 					currency.setChangepercent24h(new BigDecimal((result.getData()[currencyId].getChangePercent24Hr())));
-					currency.setThreshold(new BigDecimal(DEFAULT_THRESHOLD));
 					cr.save(currency);
 				}
 	
@@ -122,6 +126,7 @@ public class CurrencyService {
 		
 	}
 	
+	
 	public ResponseEntity<?> updateThreshold(Currency currency) {
 		if(!cr.existsById(currency.getId())) {
 			logger.error("Unknown currency with id: " + currency.getId());
@@ -134,5 +139,57 @@ public class CurrencyService {
 	public Collection<Currency> getAllCurrencies() {
 		return cr.findAll();
 	}
+	
+	
+	public BigDecimal currencyExchange(Currency from, Currency to) {
+		if(from == null || to == null) {
+			logger.error("There is no such currency");
+			return new BigDecimal(-1);
+		}
+		
+		return from.getPriceusd().divide(to.getPriceusd(), 16, RoundingMode.CEILING);		
+	}
+	
+	
+	public BigDecimal currencyExchangeIntoRealCurrency(Currency from, String to) {
+		
+		RealCurrencyDTO toCurrency = new RealCurrencyDTO();
+
+		RestTemplate restTemplate = new RestTemplate();
+		ResponseEntity<String> response = restTemplate.getForEntity(exchangeUri, String.class);
+
+		if (response.getStatusCodeValue() < STATUS_CODE_CONSTRAINT) {
+
+			try {
+
+				RealCurrencyAsset result = restTemplate.getForObject(exchangeUri, RealCurrencyAsset.class);
+				for (int i = 0; i <= result.getData().length-1; i++) {
+					if (result.getData()[i].getId().equals(to)) {
+						toCurrency.setId(result.getData()[i].getId());
+						toCurrency.setCurrencySymbol(result.getData()[i].getCurrencySymbol());
+						toCurrency.setRateUsd(result.getData()[i].getRateUsd());
+						toCurrency.setSymbol(result.getData()[i].getSymbol());
+						toCurrency.setType(result.getData()[i].getType());
+						logger.info(toCurrency.toString());
+
+					}
+				}
+				
+				toCurrency = null;
+
+			} catch (Exception e) {
+				logger.error(e.toString());
+				return new BigDecimal(-1);
+			}
+		}
+
+		if (from == null || toCurrency == null) {
+			logger.error("There is no such currency");
+			return new BigDecimal(-1);
+		}
+
+		return from.getPriceusd().divide(new BigDecimal(toCurrency.getRateUsd()), 16, RoundingMode.CEILING);
+	}
+	
 			
 } 

@@ -48,7 +48,7 @@ public class Filters {
 	
 	public Currency searchByName(String name) {
 		
-		if(cr.findAll().isEmpty()) {
+		if(cr.findAll().isEmpty() || cr.findAll().stream().filter(c -> c.getName().trim().equals(name)).collect(Collectors.toList()).isEmpty()) {
 			return null;
 		}
 		
@@ -61,7 +61,7 @@ public class Filters {
 	
 	public Currency searchBySymbol(String symbol) {
 		
-		if(cr.findAll().isEmpty()) {
+		if(cr.findAll().isEmpty() || cr.findAll().stream().filter(c -> c.getSymbol().trim().equals(symbol)).collect(Collectors.toList()).isEmpty()) {
 			return null;
 		}
 		

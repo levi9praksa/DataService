@@ -20,13 +20,8 @@ import lombok.Data;
 @NamedQuery(name="Currency.findAll", query="SELECT c FROM Currency c")
 @Data 
 public class Currency implements Serializable {
-	@Override
-	public String toString() {
-		return "Currency [id=" + id  + ", name=" + name + ", symbol=" + symbol + ", priceusd=" + priceusd 
-				+ ", changepercent24h=" + changepercent24h  + ", threshold=" + threshold + "]";
-	}
- 
-	private static final long serialVersionUID = 1L;
+
+	private static final long serialVersionUID = -1795213425947481751L;
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)

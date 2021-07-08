@@ -1,10 +1,14 @@
 package com.example.controllers;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,6 +27,8 @@ public class CurrencyController {
 
 	private Filters filters;
 	private CurrencyService currencyService;
+	
+	final Logger logger = LoggerFactory.getLogger(CurrencyService.class);
 	
 	@PreAuthorize("hasRole('USER')")
 	@RequestMapping(value = "/currencies", method = RequestMethod.GET) 
@@ -64,5 +70,19 @@ public class CurrencyController {
 	@RequestMapping(value = "/searchBySymbol", method = RequestMethod.GET)
 	public Currency searcgBySymbol(@RequestParam(value = "symbol") String symbol) {
 		return filters.searchBySymbol(symbol);
+	}
+	
+	@PreAuthorize("hasRole('USER')")
+	@GetMapping(value = "/currencyExchange")
+	public BigDecimal currencyExchange(@RequestParam(value = "from") String from, @RequestParam(value = "to") String to) {
+		return currencyService.currencyExchange(filters.searchByName(from), filters.searchByName(to));
+
+	}
+	
+	@PreAuthorize("hasRole('USER')")
+	@GetMapping(value = "/currencyExchangeIntoRealCurrency")
+	public BigDecimal currencyExchangeIntoRealCurrency(@RequestParam(value = "from") String from, @RequestParam(value = "to") String to) {
+		return currencyService.currencyExchangeIntoRealCurrency(filters.searchByName(from), to);
+
 	}
 }
